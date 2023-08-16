@@ -2,10 +2,10 @@ import glob
 import os
 import logging as log
 from typing import Tuple, Optional, List
-
+import json
 import numpy as np
 import torch
-
+from tqdm import tqdm
 from .data_loading import parallel_load_images
 from .ray_utils import (
     center_poses, generate_spiral_path, create_meshgrid, stack_camera_dirs, get_rays
@@ -147,6 +147,52 @@ def load_llff_poses_helper(datadir: str, downsample: float, near_scaling: float)
 
     return poses, near_fars, intrinsics
 
+def load_brics_poses_helper(datadir: str, downsample: float, near_scaling: float, split: str) -> Tuple[np.ndarray, np.ndarray, Intrinsics]:
+    #poses_bounds = np.load(os.path.join(datadir, 'poses_bounds.npy'))  # (N_images, 17)
+    #poses, near_fars, intrinsics = _split_poses_bounds(poses_bounds)
+    
+    with open(os.path.join(datadir, f"transforms_{split}.json"), 'r') as fp:
+        meta = json.load(fp)
+    frames = meta['frames']
+    w, h = int(frames[0]['w']/downsample), int(frames[0]['h']/downsample)
+    intrinsics = Intrinsics(w, h, frames[0]['fl_x'], frames[0]['fl_y'], frames[0]['cx'], frames[0]['cy'], [], [], [], [] )
+    for i in range(0, len(frames)):
+        focal_x = frames[i]['fl_x']
+        focal_y = frames[i]['fl_y']
+        cx = frames[i]['cx']
+        cy = frames[i]['cy']
+        intrinsics.append(focal_x, focal_y, cx, cy)
+    # Step 1: rescale focal length according to training resolution
+    intrinsics.scale(1/downsample)
+    
+    poses = []
+    cam_ids = []
+    idxs = list(range(0, len(frames)))
+    for i in tqdm(idxs, desc=f'Loading data {split} ({len(idxs)})'):
+        frame = frames[i]
+        pose = np.array(frame['transform_matrix'])
+        poses.append(pose[:3])
+        cam_ids.append(frame['file_path'].split('/')[-2])
+    #intrinsics.scale(1 / downsample)
+    poses = np.stack(poses)
+    print(poses.shape)
+    # Step 2: correct poses
+    # Original poses has rotation in form "down right back", change to "right up back"
+    # See https://github.com/bmild/nerf/issues/34
+    #poses = np.concatenate([poses[..., 1:2], -poses[..., :1], poses[..., 2:4]], -1)
+    # (N_images, 3, 4) exclude H, W, focal
+    poses, pose_avg = center_poses(poses)
+
+    # Step 3: correct scale so that the nearest depth is at a little more than 1.0
+    # See https://github.com/bmild/nerf/issues/34
+    #near_original = np.min(near_fars)
+    #scale_factor = near_original * near_scaling  # 0.75 is the default parameter
+    # the nearest depth is at 1/0.75=1.33
+    #near_fars /= scale_factor
+    #poses[..., 3] /= scale_factor
+    near_fars = torch.tensor(np.repeat(np.array([[0.1, 15.0]]), len(poses), 0))
+    
+    return poses, near_fars, intrinsics, cam_ids
 
 def load_llff_poses(datadir: str,
                     downsample: float,

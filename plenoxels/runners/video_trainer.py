@@ -18,7 +18,7 @@ from .base_trainer import BaseTrainer, init_dloader_random, initialize_model
 from .regularization import (
     PlaneTV, TimeSmoothness, HistogramLoss, L1TimePlanes, DistortionLoss
 )
-
+import numpy as np
 
 class VideoTrainer(BaseTrainer):
     def __init__(self,
@@ -123,32 +123,38 @@ class VideoTrainer(BaseTrainer):
             pb.set_postfix_str(f"PSNR={out_metrics['psnr']:.2f}", refresh=False)
             pb.update(1)
         pb.close()
-        if self.save_video:
-            write_video_to_file(
-                os.path.join(self.log_dir, f"step{self.global_step}.mp4"),
-                pred_frames
-            )
-            if len(out_depths) > 0:
+        pred_frames = np.array(pred_frames)
+        out_depths = np.array(out_depths)
+        pred_frames = pred_frames.reshape(len(dataset)//dataset.num_t, dataset.num_t, pred_frames.shape[1], pred_frames.shape[2], pred_frames.shape[3])
+        out_depths = out_depths.reshape(len(dataset)//dataset.num_t, dataset.num_t, out_depths.shape[1], out_depths.shape[2], out_depths.shape[3])
+        for i in range(len(dataset)//dataset.num_t):
+            print(pred_frames[i].shape)
+            if self.save_video:
                 write_video_to_file(
-                    os.path.join(self.log_dir, f"step{self.global_step}-depth.mp4"),
-                    out_depths
+                    os.path.join(self.log_dir, f"step{self.global_step}_{i}.mp4"),
+                    pred_frames[i]
                 )
+                if len(out_depths) > 0:
+                    write_video_to_file(
+                        os.path.join(self.log_dir, f"step{self.global_step}_{i}-depth.mp4"),
+                        out_depths[i]
+                    )
         # Calculate JOD (on whole video)
-        if self.compute_video_metrics:
-            per_scene_metrics["JOD"] = metrics.jod(
-                [f[:dataset.img_h, :, :] for f in pred_frames],
-                [f[dataset.img_h: 2*dataset.img_h, :, :] for f in pred_frames],
-            )
-            per_scene_metrics["FLIP"] = metrics.flip(
-                [f[:dataset.img_h, :, :] for f in pred_frames],
-                [f[dataset.img_h: 2*dataset.img_h, :, :] for f in pred_frames],
-            )
+        # if self.compute_video_metrics:
+        #     per_scene_metrics["JOD"] = metrics.jod(
+        #         [f[:dataset.img_h, :, :] for f in pred_frames],
+        #         [f[dataset.img_h: 2*dataset.img_h, :, :] for f in pred_frames],
+        #     )
+        #     per_scene_metrics["FLIP"] = metrics.flip(
+        #         [f[:dataset.img_h, :, :] for f in pred_frames],
+        #         [f[dataset.img_h: 2*dataset.img_h, :, :] for f in pred_frames],
+        #     )
 
-        val_metrics = [
-            self.report_test_metrics(per_scene_metrics, extra_name=None),
-        ]
-        df = pd.DataFrame.from_records(val_metrics)
-        df.to_csv(os.path.join(self.log_dir, f"test_metrics_step{self.global_step}.csv"))
+        # val_metrics = [
+        #     self.report_test_metrics(per_scene_metrics, extra_name=None),
+        # ]
+        # df = pd.DataFrame.from_records(val_metrics)
+        # df.to_csv(os.path.join(self.log_dir, f"test_metrics_step{self.global_step}.csv"))
 
     def get_save_dict(self):
         base_save_dict = super().get_save_dict()
@@ -200,7 +206,7 @@ def init_tr_data(data_downsample, data_dir, **kwargs):
         max_tsteps=kwargs['max_train_tsteps'] if keyframes else None,
         isg=isg, keyframes=keyframes, contraction=kwargs['contract'], ndc=kwargs['ndc'],
         near_scaling=float(kwargs.get('near_scaling', 0)), ndc_far=float(kwargs.get('ndc_far', 0)),
-        scene_bbox=kwargs['scene_bbox'],
+        scene_bbox=kwargs['scene_bbox'], start_t = kwargs['start_t'], num_t = kwargs['num_t']
     )
     if ist:
         tr_dset.switch_isg2ist()  # this should only happen in case we're reloading
@@ -213,14 +219,14 @@ def init_tr_data(data_downsample, data_dir, **kwargs):
     return {"tr_loader": tr_loader, "tr_dset": tr_dset}
 
 
-def init_ts_data(data_dir, split, **kwargs):
-    downsample = 2.0 # Both D-NeRF and DyNeRF use downsampling by 2
+def init_ts_data(downsample, data_dir, split, **kwargs):
+    #downsample = 2.0 # Both D-NeRF and DyNeRF use downsampling by 2
     ts_dset = Video360Dataset(
         data_dir, split=split, downsample=downsample,
         max_cameras=kwargs.get('max_test_cameras', None), max_tsteps=kwargs.get('max_test_tsteps', None),
         contraction=kwargs['contract'], ndc=kwargs['ndc'],
         near_scaling=float(kwargs.get('near_scaling', 0)), ndc_far=float(kwargs.get('ndc_far', 0)),
-        scene_bbox=kwargs['scene_bbox'],
+        scene_bbox=kwargs['scene_bbox'],start_t = kwargs['start_t'], num_t = kwargs['num_t']
     )
     return {"ts_dset": ts_dset}
 
@@ -233,5 +239,6 @@ def load_data(data_downsample, data_dirs, validate_only, render_only, **kwargs):
     else:
         od.update(tr_loader=None, tr_dset=None)
     test_split = 'render' if render_only else 'test'
-    od.update(init_ts_data(data_dirs[0], split=test_split, **kwargs))
+    print("241", kwargs.get('num_t'))
+    od.update(init_ts_data(data_downsample, data_dirs[0], split=test_split, **kwargs))
     return od

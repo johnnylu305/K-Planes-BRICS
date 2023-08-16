@@ -1,13 +1,14 @@
 config = {
- 'expname': 'cutbeef_explicit',
+ 'expname': 'bluecar_hybrid',
  'logdir': './logs/realdynamic',
  'device': 'cuda:0',
-
+ 'start_t': 0,
+ 'num_t': 150,
  # Run first for 1 step with data_downsample=4 to generate weights for ray importance sampling
- 'data_downsample': 2,
- 'data_dirs': ['data/dynerf/cut_roasted_beef'],
- 'contract': False,
- 'ndc': True,
+ 'data_downsample': 1,
+ 'data_dirs': ['/gpfs/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/blue_car/dynamic_data'],
+ 'contract': True,
+ 'ndc': False,
  'ndc_far': 2.6,
  'near_scaling': 0.95,
  'isg': False,
@@ -17,7 +18,7 @@ config = {
  'scene_bbox': [[-3.0, -1.8, -1.2], [3.0, 1.8, 1.2]],
 
  # Optimization settings
- 'num_steps': 120001,
+ 'num_steps': 90001,#90001,
  'batch_size': 4096,
  'scheduler_type': 'warmup_cosine',
  'optim_type': 'adam',
@@ -28,8 +29,8 @@ config = {
  'histogram_loss_weight': 1.0,
  'l1_time_planes': 0.0001,
  'l1_time_planes_proposal_net': 0.0001,
- 'plane_tv_weight': 0.0001,
- 'plane_tv_weight_proposal_net': 0.0001,
+ 'plane_tv_weight': 0.0002,
+ 'plane_tv_weight_proposal_net': 0.0002,
  'time_smoothness_weight': 0.001,
  'time_smoothness_weight_proposal_net': 1e-05,
 
@@ -54,13 +55,12 @@ config = {
  # Model settings
  'concat_features_across_scales': True,
  'density_activation': 'trunc_exp',
- 'linear_decoder': True,
- 'linear_decoder_layers': 1,
+ 'linear_decoder': False,
  'multiscale_res': [1, 2, 4, 8],
  'grid_config': [{
   'grid_dimensions': 2,
   'input_coordinate_dim': 4,
-  'output_coordinate_dim': 32,
+  'output_coordinate_dim': 16,
   'resolution': [64, 64, 64, 150]
  }],
 }

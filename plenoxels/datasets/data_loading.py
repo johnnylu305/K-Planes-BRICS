@@ -103,6 +103,7 @@ def _load_video_1cam(idx: int,
     all_frames = iio.imread(
         paths[idx], plugin='pyav', format='rgb24', constant_framerate=True, thread_count=2,
         filter_sequence=filters,)
+    
     imgs, timestamps = [], []
     for frame_idx, frame in enumerate(all_frames):
         if frame_idx % load_every != 0:

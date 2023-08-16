@@ -139,7 +139,6 @@ def main():
         assert args.log_dir is not None and os.path.isdir(args.log_dir)
     else:
         save_config(config)
-
     data = load_data(model_type, validate_only=validate_only, render_only=render_only or spacetime_only, **config)
     config.update(data)
     trainer = init_trainer(model_type, **config)

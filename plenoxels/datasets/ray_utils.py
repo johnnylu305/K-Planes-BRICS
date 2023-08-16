@@ -38,19 +38,18 @@ def create_meshgrid(height: int,
     return xx, yy
 
 
-def stack_camera_dirs(x: torch.Tensor, y: torch.Tensor, intrinsics: Intrinsics, opengl_camera: bool):
+def stack_camera_dirs(x: torch.Tensor, y: torch.Tensor, intrinsics: list, cam_id: torch.Tensor, opengl_camera: bool):
     # the direction here is without +0.5 pixel centering as calibration is not so accurate
     # see https://github.com/bmild/nerf/issues/24
     x = x.float()
     y = y.float()
+
     return torch.stack([
-        (x - intrinsics.center_x) / intrinsics.focal_x,
-        (y - intrinsics.center_y) / intrinsics.focal_y
+        (x - intrinsics.center_xs[cam_id]) / intrinsics.focal_xs[cam_id],
+        (y - intrinsics.center_ys[cam_id]) / intrinsics.focal_ys[cam_id]
         * (-1.0 if opengl_camera else 1.0),
         torch.full_like(x, fill_value=-1.0 if opengl_camera else 1.0)
-    ], -1)  # (H, W, 3)
-
-
+    ], -1).float()  # (H, W, 3)
 def get_ray_directions(intrinsics: Intrinsics, opengl_camera: bool, add_half: bool = True) -> torch.Tensor:
     """
     Get ray directions for all pixels in camera coordinate.
