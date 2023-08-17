@@ -128,15 +128,15 @@ class VideoTrainer(BaseTrainer):
         pred_frames = pred_frames.reshape(len(dataset)//dataset.num_t, dataset.num_t, pred_frames.shape[1], pred_frames.shape[2], pred_frames.shape[3])
         out_depths = out_depths.reshape(len(dataset)//dataset.num_t, dataset.num_t, out_depths.shape[1], out_depths.shape[2], out_depths.shape[3])
         for i in range(len(dataset)//dataset.num_t):
-            print(pred_frames[i].shape)
+            
             if self.save_video:
                 write_video_to_file(
-                    os.path.join(self.log_dir, f"step{self.global_step}_{i}.mp4"),
+                    os.path.join(self.log_dir, f"step{self.global_step}_{str(i).zfill(2)}.mp4"),
                     pred_frames[i]
                 )
                 if len(out_depths) > 0:
                     write_video_to_file(
-                        os.path.join(self.log_dir, f"step{self.global_step}_{i}-depth.mp4"),
+                        os.path.join(self.log_dir, f"step{self.global_step}_{str(i).zfill(2)}-depth.mp4"),
                         out_depths[i]
                     )
         # Calculate JOD (on whole video)

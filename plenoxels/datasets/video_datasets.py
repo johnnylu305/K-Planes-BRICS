@@ -68,43 +68,45 @@ class Video360Dataset(BaseDataset):
         else:
             dset_type = "llff"
         if dset_type == "brics":
-            # if split == "render":
-            #     assert ndc, "Unable to generate render poses without ndc: don't know near-far."
-            #     per_cam_poses, per_cam_near_fars, intrinsics, _ = load_llffvideo_poses(
-            #         datadir, downsample=self.downsample, split='all', near_scaling=self.near_scaling)
-            #     render_poses = generate_spiral_path(
-            #         per_cam_poses.numpy(), per_cam_near_fars.numpy(), n_frames=300,
-            #         n_rots=2, zrate=0.5, dt=self.near_scaling, percentile=60)
-            #     self.poses = torch.from_numpy(render_poses).float()
-            #     self.per_cam_near_fars = torch.tensor([[0.4, self.ndc_far]])
-            #     timestamps = torch.linspace(0, 299, len(self.poses))
-            #     imgs = None
-            # else:
-            per_cam_poses, per_cam_near_fars, intrinsics, cam_ids = load_bricsvideo_poses(
-                datadir, downsample=self.downsample, split=split, near_scaling=self.near_scaling)
-            
-            if split == 'test':
-                keyframes = False
-                
-            poses, imgs, timestamps, self.median_imgs = load_bricsvideo_data(cam_ids=cam_ids, datadir=datadir,
-                cam_poses=per_cam_poses, intrinsics=intrinsics,
-                split=split, keyframes=keyframes, keyframes_take_each=30, start_t=self.start_t, num_t=self.num_t)
-                
-            self.poses = poses.float()
-            imgs = imgs.float()
-            if contraction:
-                self.per_cam_near_fars = per_cam_near_fars.float()
+            if split == "render":
+                #assert ndc, "Unable to generate render poses without ndc: don't know near-far."
+                per_cam_poses, per_cam_near_fars, intrinsics, cam_ids = load_bricsvideo_poses(
+                    datadir, downsample=self.downsample, split='spiral_hr', near_scaling=self.near_scaling)
+                self_poses = self.poses[start_t:start_t+num_t]
+                self.poses = torch.from_numpy(per_cam_poses).float()
+                self.per_cam_near_fars = torch.tensor([[0.1, 15.0]])
+                timestamps = torch.range(0, num_t)
+                # render_poses = generate_spiral_path(
+                #     per_cam_poses.numpy(), per_cam_near_fars.numpy(), n_frames=300,
+                #     n_rots=2, zrate=0.5, dt=self.near_scaling, percentile=60)
+                # self.poses = torch.from_numpy(render_poses).float()
+                # self.per_cam_near_fars = torch.tensor([[0.4, self.ndc_far]])
+                # timestamps = torch.linspace(0, 299, len(self.poses))
+                imgs = None
             else:
-                self.per_cam_near_fars = torch.tensor(
-                    [[0.0, self.ndc_far]]).repeat(per_cam_near_fars.shape[0], 1)
+                per_cam_poses, per_cam_near_fars, intrinsics, cam_ids = load_bricsvideo_poses(
+                    datadir, downsample=self.downsample, split=split, near_scaling=self.near_scaling)
+                
+                if split == 'test':
+                    keyframes = False
+                    
+                poses, imgs, timestamps, self.median_imgs = load_bricsvideo_data(cam_ids=cam_ids, datadir=datadir,
+                    cam_poses=per_cam_poses, intrinsics=intrinsics,
+                    split=split, keyframes=keyframes, keyframes_take_each=30, start_t=self.start_t, num_t=self.num_t, downsample=self.downsample)
+                    
+                self.poses = poses.float()
+                imgs = imgs.float()
+                if contraction:
+                    self.per_cam_near_fars = per_cam_near_fars.float()
+                else:
+                    self.per_cam_near_fars = torch.tensor(
+                        [[0.0, self.ndc_far]]).repeat(per_cam_near_fars.shape[0], 1)
             
             # These values are tuned for the salmon video
             self.global_translation = torch.tensor([0, 0, 2.])
             self.global_scale = torch.tensor([0.5, 0.6, 1])
             # Normalize timestamps between -1, 1
-            print(timestamps)
             timestamps = (timestamps.float() / num_t) * 2 - 1 #Dynamic number of steps
-            print(timestamps)
         # Note: timestamps are stored normalized between -1, 1.
         
         elif dset_type == "llff":
@@ -183,7 +185,6 @@ class Video360Dataset(BaseDataset):
         if split == 'train':
             self.timestamps = self.timestamps[:, None, None].repeat(
                 1, intrinsics.height, intrinsics.width).reshape(-1)  # [n_frames * h * w]
-        print(self.timestamps)
         assert self.timestamps.min() >= -1.0 and self.timestamps.max() <= 1.0, "timestamps out of range."
         if imgs is not None and imgs.dtype != torch.uint8:
             imgs = (imgs * 255).to(torch.uint8)
@@ -195,7 +196,10 @@ class Video360Dataset(BaseDataset):
             imgs = imgs.view(-1, intrinsics.height * intrinsics.width, imgs.shape[-1])
 
         # ISG/IST weights are computed on 4x subsampled data.
-        weights_subsampled = int(4 / downsample)
+        if dset_type != 'brics':
+            weights_subsampled = int(4 / downsample)
+        else:
+            weights_subsampled = int(2 / downsample)
         if scene_bbox is not None:
             scene_bbox = torch.tensor(scene_bbox)
         else:
@@ -217,9 +221,9 @@ class Video360Dataset(BaseDataset):
 
         self.isg_weights = None
         self.ist_weights = None
-        if split == "train" and dset_type == 'llff':  # Only use importance sampling with DyNeRF videos
-            if os.path.exists(os.path.join(datadir, f"isg_weights.pt")):
-                self.isg_weights = torch.load(os.path.join(datadir, f"isg_weights.pt"))
+        if split == "train" and (dset_type == 'llff' or dset_type == 'brics'):  # Only use importance sampling with DyNeRF videos
+            if os.path.exists(os.path.join(datadir, f"{start_t}_{num_t}_isg_weights.pt")):
+                self.isg_weights = torch.load(os.path.join(datadir, f"{start_t}_{num_t}_isg_weights.pt"))
                 log.info(f"Reloaded {self.isg_weights.shape[0]} ISG weights from file.")
             else:
                 # Precompute ISG weights
@@ -230,12 +234,12 @@ class Video360Dataset(BaseDataset):
                     median_imgs=self.median_imgs, gamma=gamma)
                 # Normalize into a probability distribution, to speed up sampling
                 self.isg_weights = (self.isg_weights.reshape(-1) / torch.sum(self.isg_weights))
-                torch.save(self.isg_weights, os.path.join(datadir, f"isg_weights.pt"))
+                torch.save(self.isg_weights, os.path.join(datadir, f"{start_t}_{num_t}_isg_weights.pt"))
                 t_e = time.time()
                 log.info(f"Computed {self.isg_weights.shape[0]} ISG weights in {t_e - t_s:.2f}s.")
 
-            if os.path.exists(os.path.join(datadir, f"ist_weights.pt")):
-                self.ist_weights = torch.load(os.path.join(datadir, f"ist_weights.pt"))
+            if os.path.exists(os.path.join(datadir, f"{start_t}_{num_t}_ist_weights.pt")):
+                self.ist_weights = torch.load(os.path.join(datadir, f"{start_t}_{num_t}_ist_weights.pt"))
                 log.info(f"Reloaded {self.ist_weights.shape[0]} IST weights from file.")
             else:
                 # Precompute IST weights
@@ -245,7 +249,7 @@ class Video360Dataset(BaseDataset):
                     num_cameras=self.median_imgs.shape[0])
                 # Normalize into a probability distribution, to speed up sampling
                 self.ist_weights = (self.ist_weights.reshape(-1) / torch.sum(self.ist_weights))
-                torch.save(self.ist_weights, os.path.join(datadir, f"ist_weights.pt"))
+                torch.save(self.ist_weights, os.path.join(datadir, f"{start_t}_{num_t}_ist_weights.pt"))
                 t_e = time.time()
                 log.info(f"Computed {self.ist_weights.shape[0]} IST weights in {t_e - t_s:.2f}s.")
 
@@ -495,6 +499,7 @@ def load_bricsvideo_data(cam_ids: List[str],
                         keyframes_take_each: Optional[int] = None,
                         start_t: int = 0,
                         num_t: int = 10,
+                        downsample: int = 1,
                         ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     if keyframes and (keyframes_take_each is None or keyframes_take_each < 1):
         raise ValueError(f"'keyframes_take_each' must be a positive number, "
@@ -519,7 +524,9 @@ def load_bricsvideo_data(cam_ids: List[str],
         per_cam_imgs = []
         cam_id = cam_ids[i]
         for j in range(start_t, start_t+num_t):
-            per_cam_imgs.append(T.ToTensor()(Image.open(os.path.join(datadir, "frames_1", cam_id,  f"{j:08d}.png"))).permute(1, 2, 0))
+            img = Image.open(os.path.join(datadir, "frames_1", cam_id,  f"{j:08d}.png"))
+            img = img.resize((round(img.size[0]/downsample), round(img.size[1]/downsample)), Image.LANCZOS)
+            per_cam_imgs.append(T.ToTensor()(img).permute(1, 2, 0))
             timestamps.append(j-start_t)
             poses.append(cam_poses[i])
             

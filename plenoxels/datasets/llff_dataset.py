@@ -154,7 +154,7 @@ def load_brics_poses_helper(datadir: str, downsample: float, near_scaling: float
     with open(os.path.join(datadir, f"transforms_{split}.json"), 'r') as fp:
         meta = json.load(fp)
     frames = meta['frames']
-    w, h = int(frames[0]['w']/downsample), int(frames[0]['h']/downsample)
+    w, h = int(frames[0]['w']), int(frames[0]['h'])
     intrinsics = Intrinsics(w, h, frames[0]['fl_x'], frames[0]['fl_y'], frames[0]['cx'], frames[0]['cy'], [], [], [], [] )
     for i in range(0, len(frames)):
         focal_x = frames[i]['fl_x']
@@ -175,13 +175,12 @@ def load_brics_poses_helper(datadir: str, downsample: float, near_scaling: float
         cam_ids.append(frame['file_path'].split('/')[-2])
     #intrinsics.scale(1 / downsample)
     poses = np.stack(poses)
-    print(poses.shape)
     # Step 2: correct poses
     # Original poses has rotation in form "down right back", change to "right up back"
     # See https://github.com/bmild/nerf/issues/34
     #poses = np.concatenate([poses[..., 1:2], -poses[..., :1], poses[..., 2:4]], -1)
     # (N_images, 3, 4) exclude H, W, focal
-    poses, pose_avg = center_poses(poses)
+    #poses, pose_avg = center_poses(poses)
 
     # Step 3: correct scale so that the nearest depth is at a little more than 1.0
     # See https://github.com/bmild/nerf/issues/34
