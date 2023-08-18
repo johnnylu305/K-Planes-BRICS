@@ -59,6 +59,7 @@ class Video360Dataset(BaseDataset):
         self.median_imgs = None
         self.num_t = num_t
         self.start_t = start_t
+        self.cam_ids = []
         if contraction and ndc:
             raise ValueError("Options 'contraction' and 'ndc' are exclusive.")
         if "lego" in datadir or "dnerf" in datadir:
@@ -72,7 +73,8 @@ class Video360Dataset(BaseDataset):
                 #assert ndc, "Unable to generate render poses without ndc: don't know near-far."
                 per_cam_poses, per_cam_near_fars, intrinsics, cam_ids = load_bricsvideo_poses(
                     datadir, downsample=self.downsample, split='spiral_hr', near_scaling=self.near_scaling)
-                self_poses = self.poses[start_t:start_t+num_t]
+                self.cam_ids = cam_ids
+                per_cam_poses = per_cam_poses[start_t:start_t+num_t]
                 self.poses = torch.from_numpy(per_cam_poses).float()
                 self.per_cam_near_fars = torch.tensor([[0.1, 15.0]])
                 timestamps = torch.range(0, num_t)
@@ -89,7 +91,7 @@ class Video360Dataset(BaseDataset):
                 
                 if split == 'test':
                     keyframes = False
-                    
+                self.cam_ids = cam_ids
                 poses, imgs, timestamps, self.median_imgs = load_bricsvideo_data(cam_ids=cam_ids, datadir=datadir,
                     cam_poses=per_cam_poses, intrinsics=intrinsics,
                     split=split, keyframes=keyframes, keyframes_take_each=30, start_t=self.start_t, num_t=self.num_t, downsample=self.downsample)
@@ -530,10 +532,10 @@ def load_bricsvideo_data(cam_ids: List[str],
             timestamps.append(j-start_t)
             poses.append(cam_poses[i])
             
-        if per_cam_imgs[0].shape[-1] == 4:
+        # if per_cam_imgs[0].shape[-1] == 4:
                 #per_cam_imgs = [img.view(4, -1).permute(1, 0) for img in per_cam_imgs]  # (T, h*w, 4) RGBA
-            for j in range(len(per_cam_imgs)):
-                per_cam_imgs[j] = per_cam_imgs[j][:,:, :3] * per_cam_imgs[j][:,:, -1:] + (1 - per_cam_imgs[j][:,:, -1:])*1 # blend A to RGB
+            # for j in range(len(per_cam_imgs)):
+            #    per_cam_imgs[j] = per_cam_imgs[j][:,:, :3] * per_cam_imgs[j][:,:, -1:] + (1 - per_cam_imgs[j][:,:, -1:])*1 # blend A to RGB
                     
         per_cam_imgs = torch.stack(per_cam_imgs, 0)
         med_img, _ = torch.median(per_cam_imgs, dim=0)

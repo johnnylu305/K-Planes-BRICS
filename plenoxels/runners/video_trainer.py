@@ -7,7 +7,7 @@ from typing import Dict, MutableMapping, Union, Any, List
 import pandas as pd
 import torch
 import torch.utils.data
-
+from PIL import Image
 from plenoxels.datasets.video_datasets import Video360Dataset
 from plenoxels.utils.ema import EMA
 from plenoxels.utils.my_tqdm import tqdm
@@ -108,10 +108,19 @@ class VideoTrainer(BaseTrainer):
     def validate(self):
         dataset = self.test_dataset
         per_scene_metrics: Dict[str, Union[float, List]] = defaultdict(list)
+        raw_frames = []
         pred_frames, out_depths = [], []
         pb = tqdm(total=len(dataset), desc=f"Test scene ({dataset.name})")
+        
+        if isinstance(dataset.img_h, int):
+            img_h, img_w = dataset.img_h, dataset.img_w
+        else:
+            img_h, img_w = dataset.img_h[img_idx], dataset.img_w[img_idx]
+        
         for img_idx, data in enumerate(dataset):
             preds = self.eval_step(data)
+            raw_frame = preds['rgb'].reshape(img_h, img_w, 3)
+            raw_frames.append(raw_frame.cpu().numpy())
             out_metrics, out_img, out_depth = self.evaluate_metrics(
                 data["imgs"], preds, dset=dataset, img_idx=img_idx, name=None,
                 save_outputs=self.save_outputs)
@@ -122,13 +131,15 @@ class VideoTrainer(BaseTrainer):
                 per_scene_metrics[k].append(v)
             pb.set_postfix_str(f"PSNR={out_metrics['psnr']:.2f}", refresh=False)
             pb.update(1)
+            
         pb.close()
+        raw_frames = np.array(raw_frames)
         pred_frames = np.array(pred_frames)
         out_depths = np.array(out_depths)
+        raw_frames = raw_frames.reshape(len(dataset)//dataset.num_t, dataset.num_t, img_h, img_w, 3)
         pred_frames = pred_frames.reshape(len(dataset)//dataset.num_t, dataset.num_t, pred_frames.shape[1], pred_frames.shape[2], pred_frames.shape[3])
         out_depths = out_depths.reshape(len(dataset)//dataset.num_t, dataset.num_t, out_depths.shape[1], out_depths.shape[2], out_depths.shape[3])
         for i in range(len(dataset)//dataset.num_t):
-            
             if self.save_video:
                 write_video_to_file(
                     os.path.join(self.log_dir, f"step{self.global_step}_{str(i).zfill(2)}.mp4"),
@@ -139,6 +150,16 @@ class VideoTrainer(BaseTrainer):
                         os.path.join(self.log_dir, f"step{self.global_step}_{str(i).zfill(2)}-depth.mp4"),
                         out_depths[i]
                     )
+            
+            if not os.path.exists(os.path.join(self.log_dir, "test_images")):
+                os.mkdir(os.path.join(self.log_dir, "test_images"))
+            if not os.path.exists(os.path.join(self.log_dir, "test_images", dataset.cam_ids[i])):
+                os.mkdir(os.path.join(self.log_dir, "test_images", dataset.cam_ids[i]))
+            for j in range(dataset.num_t):
+                out_path = os.path.join(self.log_dir, "test_images", dataset.cam_ids[i], f"{dataset.cam_ids[i]}_{str(dataset.start_t+j).zfill(5)}.png")
+                im = Image.fromarray((raw_frames[i, j]*255).astype(np.uint8), 'RGB')
+                im.save(out_path)
+                
         # Calculate JOD (on whole video)
         # if self.compute_video_metrics:
         #     per_scene_metrics["JOD"] = metrics.jod(

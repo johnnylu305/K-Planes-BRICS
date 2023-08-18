@@ -6,6 +6,7 @@ import pprint
 import sys
 from typing import List, Dict, Any
 import tempfile
+import time
 
 import numpy as np
 
@@ -158,4 +159,6 @@ def main():
 
 
 if __name__ == "__main__":
+    start_time = time.time()
     main()
+    print("@@@@@@@@@@--- %s seconds ---" % (time.time() - start_time))
