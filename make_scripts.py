@@ -18,8 +18,8 @@ if __name__=="__main__":
 
     config_root = os.path.join('plenoxels', 'configs', 'final', 'Brics')
 
-    log_dir = os.path.join(data_root, obj, "dynamic_data", "kplanes")
     for obj in objects:
+        log_dir = os.path.join(data_root, obj, "dynamic_data", "kplanes")
         obj_config_root = os.path.join(config_root, obj)
         configs = sorted(glob(os.path.join(obj_config_root, '*.py')))
         assert len(configs) % 2 == 0
@@ -28,6 +28,8 @@ if __name__=="__main__":
         #print(f'{os.path.join(root, obj+".sh")}')
         with open(f'{os.path.join(root, obj+".sh")}','w') as data: 
             data.write('#!/bin/bash\n\n\n\n')
+            data.write(f"rm {os.path.join(root, obj+'.txt')}\n")
+            data.write(f"rm {os.path.join(root, obj+'_val.txt')}\n")
             for i in range(0, len(configs), 2):
                 data.write(f"PYTHONPATH='.' python plenoxels/main.py"+ \
                     f" --config-path {configs[i+1]}\n")
@@ -35,6 +37,6 @@ if __name__=="__main__":
                     f" --config-path {configs[i]} >> {os.path.join(root, obj+'.txt')}\n")
                 log_obj_dir = os.path.join(log_dir, f"{obj}_{i//2:02d}")
                 data.write(f"PYTHONPATH='.' python plenoxels/main.py"+ \
-                    f" --config-path {configs[i]} >> {os.path.join(root, obj+'.txt')}"+ \
+                    f" --config-path {configs[i]} >> {os.path.join(root, obj+'_val.txt')}"+ \
                     f" --validate-only"+ \
                     f" --log-dir {log_obj_dir}\n\n")

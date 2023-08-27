@@ -1,6 +1,6 @@
 config = {
 'expname' : 'pour_salt_00',
-'logdir' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/pour_salt/dynamic_data/kplanes'],
+'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/pour_salt/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 0,
 'num_t' : 150,

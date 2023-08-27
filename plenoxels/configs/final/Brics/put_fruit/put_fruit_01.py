@@ -1,6 +1,6 @@
 config = {
 'expname' : 'put_fruit_01',
-'logdir' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/put_fruit/dynamic_data/kplanes'],
+'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/put_fruit/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 150,
 'num_t' : 177,

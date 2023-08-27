@@ -1,6 +1,6 @@
 config = {
 'expname' : 'k1_double_punch_00_IST',
-'logdir' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/k1_double_punch/dynamic_data/kplanes'],
+'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/k1_double_punch/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 0,
 'num_t' : 150,

@@ -1,6 +1,6 @@
 config = {
 'expname' : 'hour_glass_09',
-'logdir' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/hour_glass/dynamic_data/kplanes'],
+'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/hour_glass/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 1350,
 'num_t' : 150,

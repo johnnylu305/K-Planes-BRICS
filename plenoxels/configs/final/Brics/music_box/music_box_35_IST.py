@@ -1,6 +1,6 @@
 config = {
 'expname' : 'music_box_35_IST',
-'logdir' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/music_box/dynamic_data/kplanes'],
+'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/music_box/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 5250,
 'num_t' : 150,

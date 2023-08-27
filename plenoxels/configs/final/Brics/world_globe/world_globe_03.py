@@ -1,6 +1,6 @@
 config = {
 'expname' : 'world_globe_03',
-'logdir' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/world_globe/dynamic_data/kplanes'],
+'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/world_globe/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 450,
 'num_t' : 150,

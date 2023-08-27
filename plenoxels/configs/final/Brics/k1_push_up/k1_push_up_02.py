@@ -1,6 +1,6 @@
 config = {
 'expname' : 'k1_push_up_02',
-'logdir' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/k1_push_up/dynamic_data/kplanes'],
+'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/k1_push_up/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 300,
 'num_t' : 150,

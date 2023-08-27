@@ -1,6 +1,6 @@
 config = {
 'expname' : 'clock_08_IST',
-'logdir' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/clock/dynamic_data/kplanes'],
+'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/clock/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 1200,
 'num_t' : 150,

@@ -1,6 +1,6 @@
 config = {
 'expname' : 'keyboard_mouse_01',
-'logdir' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/keyboard_mouse/dynamic_data/kplanes'],
+'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/keyboard_mouse/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 150,
 'num_t' : 150,

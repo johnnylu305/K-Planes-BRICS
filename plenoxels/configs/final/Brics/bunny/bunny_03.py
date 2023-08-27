@@ -1,6 +1,6 @@
 config = {
 'expname' : 'bunny_03',
-'logdir' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/bunny/dynamic_data/kplanes'],
+'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/bunny/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 450,
 'num_t' : 150,

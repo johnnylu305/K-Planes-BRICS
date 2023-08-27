@@ -4,7 +4,8 @@ import logging as log
 from typing import Union
 
 import torch
-
+from PIL import Image
+import numpy as np
 from plenoxels.models.lowrank_model import LowrankModel
 from plenoxels.utils.my_tqdm import tqdm
 from plenoxels.ops.image.io import write_video_to_file
@@ -21,7 +22,7 @@ def render_to_path(trainer: Union[VideoTrainer, StaticTrainer], extra_name: str 
     """
     dataset = trainer.test_dataset
 
-    pb = tqdm(total=100, desc=f"Rendering scene")
+    pb = tqdm(total=dataset.num_t, desc=f"Rendering scene")
     frames = []
     for img_idx, data in enumerate(dataset):
         ts_render = trainer.eval_step(data)
@@ -42,11 +43,18 @@ def render_to_path(trainer: Union[VideoTrainer, StaticTrainer], extra_name: str 
         frames.append(preds_rgb)
         pb.update(1)
     pb.close()
+    save_dir = os.path.join(*(trainer.log_dir.split('/')[0:-1]))
+    save_dir = "/" + os.path.join(save_dir, "traj")
+    if not os.path.exists(save_dir):
+        os.mkdir(save_dir)
+    for j in range(dataset.num_t):
+        out_path = os.path.join(save_dir, f"{str(dataset.start_t+j).zfill(5)}.png")
+        im = Image.fromarray((frames[j]).astype(np.uint8), 'RGB')
+        im.save(out_path)
 
-
-    out_fname = os.path.join(trainer.log_dir, f"rendering_path_{extra_name}.mp4")
-    write_video_to_file(out_fname, frames)
-    log.info(f"Saved rendering path with {len(frames)} frames to {out_fname}")
+    # out_fname = os.path.join(trainer.log_dir, f"rendering_path_{extra_name}.mp4")
+    # write_video_to_file(out_fname, frames)
+    # log.info(f"Saved rendering path with {len(frames)} frames to {out_fname}")
 
 
 def normalize_for_disp(img):

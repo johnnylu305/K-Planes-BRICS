@@ -1,6 +1,6 @@
 config = {
 'expname' : 'writing_2_03',
-'logdir' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/writing_2/dynamic_data/kplanes'],
+'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/writing_2/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 450,
 'num_t' : 31,

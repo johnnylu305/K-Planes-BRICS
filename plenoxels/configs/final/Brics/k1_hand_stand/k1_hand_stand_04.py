@@ -1,6 +1,6 @@
 config = {
 'expname' : 'k1_hand_stand_04',
-'logdir' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/k1_hand_stand/dynamic_data/kplanes'],
+'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/k1_hand_stand/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 600,
 'num_t' : 150,

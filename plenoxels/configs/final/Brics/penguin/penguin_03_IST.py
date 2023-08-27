@@ -1,6 +1,6 @@
 config = {
 'expname' : 'penguin_03_IST',
-'logdir' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/penguin/dynamic_data/kplanes'],
+'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/penguin/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 450,
 'num_t' : 150,

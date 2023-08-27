@@ -1,6 +1,6 @@
 config = {
 'expname' : 'put_candy_02_IST',
-'logdir' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/put_candy/dynamic_data/kplanes'],
+'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/put_candy/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 300,
 'num_t' : 169,

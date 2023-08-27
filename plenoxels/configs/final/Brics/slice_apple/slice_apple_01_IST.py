@@ -1,6 +1,6 @@
 config = {
 'expname' : 'slice_apple_01_IST',
-'logdir' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/slice_apple/dynamic_data/kplanes'],
+'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/slice_apple/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 150,
 'num_t' : 150,

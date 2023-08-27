@@ -69,7 +69,7 @@ if __name__=="__main__":
         #print(num_ts)
         # update number of chunk
         num_chunk = len(num_ts)
-        log_dir = [os.path.join(data_root, obj, "dynamic_data", "kplanes")]
+        log_dir = os.path.join(data_root, obj, "dynamic_data", "kplanes")
         # make config for ist
         for i in range(num_chunk):
             config['objname'] = f'{obj}'

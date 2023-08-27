@@ -76,8 +76,9 @@ class Video360Dataset(BaseDataset):
                 self.cam_ids = cam_ids
                 per_cam_poses = per_cam_poses[start_t:start_t+num_t]
                 self.poses = torch.from_numpy(per_cam_poses).float()
+                print("Num poses: ", len(self.poses))
                 self.per_cam_near_fars = torch.tensor([[0.1, 15.0]])
-                timestamps = torch.range(0, num_t)
+                timestamps = torch.arange(0, num_t)
                 # render_poses = generate_spiral_path(
                 #     per_cam_poses.numpy(), per_cam_near_fars.numpy(), n_frames=300,
                 #     n_rots=2, zrate=0.5, dt=self.near_scaling, percentile=60)

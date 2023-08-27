@@ -1,6 +1,6 @@
 config = {
 'expname' : 'wolf_17_IST',
-'logdir' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/wolf/dynamic_data/kplanes'],
+'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/wolf/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 2550,
 'num_t' : 150,

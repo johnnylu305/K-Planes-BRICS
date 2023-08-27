@@ -1,6 +1,6 @@
 config = {
 'expname' : 'horse_12_IST',
-'logdir' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/horse/dynamic_data/kplanes'],
+'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/horse/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 1800,
 'num_t' : 150,
