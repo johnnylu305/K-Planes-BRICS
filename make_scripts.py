@@ -4,10 +4,12 @@ from glob import glob
 
 
 if __name__=="__main__":
+   
     data_root = os.path.join('/', 'oscar', 'data', 'ssrinath', 'projects', 'brics_dyscene', \
         'dynamic_1', 'brics-tools', 'assets', 'objects')
     #print(data_root)
 
+    #objects = ["battery_10_forward", "battery_10_multiview", "bunny_10_forward", "bunny_10_multiview", "clock_10_forward", "clock_10_multiview", "horse_10_forward", "horse_10_multiview", "music_box_10_forward", "music_box_10_multiview", "scissor_10_forward", "scissor_10_multiview", "world_globe_10_forward", "world_globe_10_multiview", "wolf_10_forward", "wolf_10_multiview"]
     objects = []
     for obj in os.listdir(data_root):
         if obj not in ['README.md', 'all_videos', 'videos']:

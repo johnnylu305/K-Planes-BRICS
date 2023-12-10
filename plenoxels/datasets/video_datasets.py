@@ -90,7 +90,7 @@ class Video360Dataset(BaseDataset):
                 per_cam_poses, per_cam_near_fars, intrinsics, cam_ids = load_bricsvideo_poses(
                     datadir, downsample=self.downsample, split=split, near_scaling=self.near_scaling)
                 
-                if split == 'test':
+                if split == 'test' or split == 'org':
                     keyframes = False
                 self.cam_ids = cam_ids
                 poses, imgs, timestamps, self.median_imgs = load_bricsvideo_data(cam_ids=cam_ids, datadir=datadir,
@@ -225,8 +225,8 @@ class Video360Dataset(BaseDataset):
         self.isg_weights = None
         self.ist_weights = None
         if split == "train" and (dset_type == 'llff' or dset_type == 'brics'):  # Only use importance sampling with DyNeRF videos
-            if os.path.exists(os.path.join(datadir, f"{start_t}_{num_t}_isg_weights.pt")):
-                self.isg_weights = torch.load(os.path.join(datadir, f"{start_t}_{num_t}_isg_weights.pt"))
+            if os.path.exists(os.path.join(datadir, f"{num_t}", f"{start_t}_{num_t}_isg_weights.pt")):
+                self.isg_weights = torch.load(os.path.join(datadir, f"{num_t}", f"{start_t}_{num_t}_isg_weights.pt"))
                 log.info(f"Reloaded {self.isg_weights.shape[0]} ISG weights from file.")
             else:
                 # Precompute ISG weights
@@ -237,12 +237,13 @@ class Video360Dataset(BaseDataset):
                     median_imgs=self.median_imgs, gamma=gamma)
                 # Normalize into a probability distribution, to speed up sampling
                 self.isg_weights = (self.isg_weights.reshape(-1) / torch.sum(self.isg_weights))
-                torch.save(self.isg_weights, os.path.join(datadir, f"{start_t}_{num_t}_isg_weights.pt"))
+                os.makedirs(os.path.join(datadir, f"{num_t}"), exist_ok=True)
+                torch.save(self.isg_weights, os.path.join(datadir, f"{num_t}", f"{start_t}_{num_t}_isg_weights.pt"))
                 t_e = time.time()
                 log.info(f"Computed {self.isg_weights.shape[0]} ISG weights in {t_e - t_s:.2f}s.")
 
-            if os.path.exists(os.path.join(datadir, f"{start_t}_{num_t}_ist_weights.pt")):
-                self.ist_weights = torch.load(os.path.join(datadir, f"{start_t}_{num_t}_ist_weights.pt"))
+            if os.path.exists(os.path.join(datadir, f"{num_t}", f"{start_t}_{num_t}_ist_weights.pt")):
+                self.ist_weights = torch.load(os.path.join(datadir, f"{num_t}", f"{start_t}_{num_t}_ist_weights.pt"))
                 log.info(f"Reloaded {self.ist_weights.shape[0]} IST weights from file.")
             else:
                 # Precompute IST weights
@@ -252,7 +253,8 @@ class Video360Dataset(BaseDataset):
                     num_cameras=self.median_imgs.shape[0])
                 # Normalize into a probability distribution, to speed up sampling
                 self.ist_weights = (self.ist_weights.reshape(-1) / torch.sum(self.ist_weights))
-                torch.save(self.ist_weights, os.path.join(datadir, f"{start_t}_{num_t}_ist_weights.pt"))
+                os.makedirs(os.path.join(datadir, f"{num_t}"), exist_ok=True)
+                torch.save(self.ist_weights, os.path.join(datadir, f"{num_t}", f"{start_t}_{num_t}_ist_weights.pt"))
                 t_e = time.time()
                 log.info(f"Computed {self.ist_weights.shape[0]} IST weights in {t_e - t_s:.2f}s.")
 
@@ -527,7 +529,13 @@ def load_bricsvideo_data(cam_ids: List[str],
         per_cam_imgs = []
         cam_id = cam_ids[i]
         for j in range(start_t, start_t+num_t):
-            img = Image.open(os.path.join(datadir, "frames_1", cam_id,  f"{j:08d}.png"))
+            if split == 'org':
+                org_datadir = os.path.join(os.path.split(datadir)[0].rsplit("_", 1)[0], os.path.split(datadir)[1])
+                if i==0 and j==start_t:
+                    print("Datadir:", org_datadir)
+                img = Image.open(os.path.join(org_datadir, "frames_1", cam_id,  f"{j:08d}.png"))
+            else:
+                img = Image.open(os.path.join(datadir, "frames_1", cam_id,  f"{j:08d}.png"))
             img = img.resize((round(img.size[0]/downsample), round(img.size[1]/downsample)), Image.LANCZOS)
             per_cam_imgs.append(T.ToTensor()(img).permute(1, 2, 0))
             timestamps.append(j-start_t)
