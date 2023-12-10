@@ -252,7 +252,7 @@ def init_ts_data(downsample, data_dir, split, **kwargs):
     return {"ts_dset": ts_dset}
 
 
-def load_data(data_downsample, data_dirs, validate_only, render_only, **kwargs):
+def load_data(data_downsample, data_dirs, validate_only, render_only, use_org_resolution, **kwargs):
     assert len(data_dirs) == 1
     od: Dict[str, Any] = {}
     if not validate_only and not render_only:
@@ -260,6 +260,9 @@ def load_data(data_downsample, data_dirs, validate_only, render_only, **kwargs):
     else:
         od.update(tr_loader=None, tr_dset=None)
     test_split = 'render' if render_only else 'test'
+    if use_org_resolution:
+        test_split = 'org'
+    print("Test Split:", test_split)
     print("241", kwargs.get('num_t'))
     od.update(init_ts_data(data_downsample, data_dirs[0], split=test_split, **kwargs))
     return od

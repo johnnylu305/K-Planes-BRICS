@@ -4,17 +4,18 @@ from glob import glob
 
 
 if __name__=="__main__":
+    #num_frames = '450'
     data_root = os.path.join('/', 'oscar', 'data', 'ssrinath', 'projects', 'brics_dyscene', \
-        'dynamic_1', 'brics-tools', 'assets', 'objects')
+        'dynamic_1_long', 'brics-tools', 'assets', 'objects')
     #print(data_root)
 
-    objects = []
-    for obj in os.listdir(data_root):
-        if obj not in ['README.md', 'all_videos', 'videos']:
-            objects.append(obj)
+    objects = ["painting"]
+    #for obj in os.listdir(data_root):
+    #    if obj not in ['README.md', 'all_videos', 'videos']:
+    #        objects.append(obj)
     #print(objects)
     #print(len(objects))
-    assert len(objects) == 46
+    #assert len(objects) == 46
 
     config_root = os.path.join('plenoxels', 'configs', 'final', 'Brics')
 

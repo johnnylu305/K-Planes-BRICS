@@ -29,16 +29,16 @@ def save_config(config):
 
 if __name__=="__main__":
     data_root = os.path.join('/', 'oscar', 'data', 'ssrinath', 'projects', 'brics_dyscene', \
-        'dynamic_1', 'brics-tools', 'assets', 'objects')
+        'dynamic_1_long', 'brics-tools', 'assets', 'objects')
     #print(data_root)
 
-    objects = []
-    for obj in os.listdir(data_root):
-        if obj not in ['README.md', 'all_videos', 'videos']:
-            objects.append(obj)
+    objects = ["painting"]
+    #for obj in os.listdir(data_root):
+    #    if obj not in ['README.md', 'all_videos', 'videos']:
+    #        objects.append(obj)
     #print(objects)
     #print(len(objects))
-    assert len(objects) == 46
+    #assert len(objects) == 46
 
     for obj in objects:
         img_root = os.path.join(data_root, obj, 'dynamic_data', 'frames_1', 'cam00')

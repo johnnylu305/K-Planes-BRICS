@@ -172,7 +172,7 @@ def load_brics_poses_helper(datadir: str, downsample: float, near_scaling: float
         frame = frames[i]
         pose = np.array(frame['transform_matrix'])
         poses.append(pose[:3])
-        if split=="test" or split=="train":
+        if split=="test" or split=="train" or split=="org":
             cam_ids.append(frame['file_path'].split('/')[-2])
     #intrinsics.scale(1 / downsample)
     poses = np.stack(poses)

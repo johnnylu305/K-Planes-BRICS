@@ -45,13 +45,13 @@ def setup_logging(log_level=logging.INFO):
                         force=True)
 
 
-def load_data(model_type: str, data_downsample, data_dirs, validate_only: bool, render_only: bool, **kwargs):
+def load_data(model_type: str, data_downsample, data_dirs, validate_only: bool, render_only: bool, use_org_resolution: bool, **kwargs):
     data_downsample = parse_optfloat(data_downsample, default_val=1.0)
 
     if model_type == "video":
         return video_trainer.load_data(
             data_downsample, data_dirs, validate_only=validate_only,
-            render_only=render_only, **kwargs)
+            render_only=render_only, use_org_resolution=use_org_resolution, **kwargs)
     elif model_type == "phototourism":
         return phototourism_trainer.load_data(
             data_downsample, data_dirs, validate_only=validate_only,
@@ -94,6 +94,7 @@ def main():
 
     p.add_argument('--render-only', action='store_true')
     p.add_argument('--validate-only', action='store_true')
+    p.add_argument('--use-org-resolution', action='store_true')
     p.add_argument('--spacetime-only', action='store_true')
     p.add_argument('--config-path', type=str, required=True)
     p.add_argument('--log-dir', type=str, default=None)
@@ -127,6 +128,7 @@ def main():
         model_type = "static"
     validate_only = args.validate_only
     render_only = args.render_only
+    use_org_resolution = args.use_org_resolution
     spacetime_only = args.spacetime_only
     if validate_only and render_only:
         raise ValueError("render_only and validate_only are mutually exclusive.")
@@ -140,7 +142,7 @@ def main():
         assert args.log_dir is not None and os.path.isdir(args.log_dir)
     else:
         save_config(config)
-    data = load_data(model_type, validate_only=validate_only, render_only=render_only or spacetime_only, **config)
+    data = load_data(model_type, validate_only=validate_only, render_only=render_only or spacetime_only, use_org_resolution=use_org_resolution, **config)
     config.update(data)
     trainer = init_trainer(model_type, **config)
     if args.log_dir is not None:
