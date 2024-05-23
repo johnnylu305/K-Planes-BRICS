@@ -28,46 +28,46 @@ def save_config(config):
 
 
 if __name__=="__main__":
-    data_root = os.path.join('/', 'oscar', 'data', 'ssrinath', 'projects', 'brics_dyscene', \
-        'dynamic_1', 'brics-tools', 'assets', 'objects')
-    #print(data_root)
-
-    #objects = ["battery_10_forward", "battery_10_multiview", "bunny_10_forward", "bunny_10_multiview", "clock_10_forward", "clock_10_multiview", "horse_10_forward", "horse_10_multiview", "music_box_10_forward", "music_box_10_multiview", "scissor_10_forward", "scissor_10_multiview", "world_globe_10_forward", "world_globe_10_multiview", "wolf_10_forward", "wolf_10_multiview"]
+    data_root = os.path.join('assets', 'objects')
+    script_root = os.path.join('..', '..', 'DiVa360', 'objects_scripts')
     objects = []
-    for obj in os.listdir(data_root):
+    for obj in os.listdir(script_root):
         if obj not in ['README.md', 'all_videos', 'videos']:
             objects.append(obj)
-    #print(objects)
-    #print(len(objects))
-    assert len(objects) == 46
+
+    assert len(objects) == 54
 
     for obj in objects:
-        img_root = os.path.join(data_root, obj, 'dynamic_data', 'frames_1', 'cam00')
-        img_paths = glob(os.path.join(img_root, '*.png'))
-        # get number of images
-        num_img = len(img_paths)
+        move_script = os.path.join(script_root, obj, 'move.sh')
+        with open(move_script, 'r') as f:
+            temp = f.read()
+            temp = temp.split(' ')
+            for i, t in enumerate(temp):
+                if "--num_frames" in t:
+                    num_img = int(temp[i+1])
+                    break
+            
         print(f'{obj}: {num_img}')
         # split video into several chunks of size 150
         # merge last chunk and last second chunk if last chunk is smaller than 30
         num_chunk = num_img//150 if num_img%150 == 0 else num_img//150 + 1
         start_ts = []
         num_ts = []
-        #print(num_chunk)
+
         for i in range(0, num_chunk, 1):
             # is last chunk
             if i + 1 == num_chunk:
-                remanning = num_img - i * 150
+                remaining = num_img - i * 150
                 # keep last chunk
-                if remanning >= 30:
+                if remaining >= 30:
                     start_ts.append(i * 150)
-                    num_ts.append(remanning)
+                    num_ts.append(remaining)
                 else:
-                    num_ts[-1] = num_ts[-1] + remanning
+                    num_ts[-1] = num_ts[-1] + remaining
             else:
                 start_ts.append(i * 150)
                 num_ts.append(150)
-        #print(start_ts)
-        #print(num_ts)
+                
         # update number of chunk
         num_chunk = len(num_ts)
         log_dir = os.path.join(data_root, obj, "dynamic_data", "kplanes")

@@ -1,11 +1,11 @@
 config = {
 'expname' : 'hour_glass_09',
-'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/hour_glass/dynamic_data/kplanes',
+'logdir' : 'assets/objects/hour_glass/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 1350,
 'num_t' : 150,
 'data_downsample' : 1,
-'data_dirs' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/hour_glass/dynamic_data'],
+'data_dirs' : ['assets/objects/hour_glass/dynamic_data'],
 'contract' : True,
 'ndc' : False,
 'ndc_far' : 2.6,

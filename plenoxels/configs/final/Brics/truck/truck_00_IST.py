@@ -1,11 +1,11 @@
 config = {
 'expname' : 'truck_00_IST',
-'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/truck/dynamic_data/kplanes',
+'logdir' : 'assets/objects/truck/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 0,
 'num_t' : 150,
 'data_downsample' : 2,
-'data_dirs' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/truck/dynamic_data'],
+'data_dirs' : ['assets/objects/truck/dynamic_data'],
 'contract' : True,
 'ndc' : False,
 'ndc_far' : 2.6,

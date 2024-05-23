@@ -1,11 +1,11 @@
 config = {
 'expname' : 'flip_book_01',
-'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/flip_book/dynamic_data/kplanes',
+'logdir' : 'assets/objects/flip_book/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 150,
 'num_t' : 150,
 'data_downsample' : 1,
-'data_dirs' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/flip_book/dynamic_data'],
+'data_dirs' : ['assets/objects/flip_book/dynamic_data'],
 'contract' : True,
 'ndc' : False,
 'ndc_far' : 2.6,

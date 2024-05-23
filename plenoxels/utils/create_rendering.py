@@ -44,7 +44,7 @@ def render_to_path(trainer: Union[VideoTrainer, StaticTrainer], extra_name: str 
         pb.update(1)
     pb.close()
     save_dir = os.path.join(*(trainer.log_dir.split('/')[0:-1]))
-    save_dir = "/" + os.path.join(save_dir, "traj")
+    save_dir = os.path.join(save_dir, "traj")
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
     for j in range(dataset.num_t):

@@ -137,7 +137,7 @@ def main():
     if validate_only and spacetime_only:
         raise ValueError("validate_only and spacetime_only are mutually exclusive.")
 
-    pprint.pprint(config)
+    #pprint.pprint(config)
     if validate_only or render_only:
         assert args.log_dir is not None and os.path.isdir(args.log_dir)
     else:

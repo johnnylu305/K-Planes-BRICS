@@ -62,12 +62,8 @@ class Video360Dataset(BaseDataset):
         self.cam_ids = []
         if contraction and ndc:
             raise ValueError("Options 'contraction' and 'ndc' are exclusive.")
-        if "lego" in datadir or "dnerf" in datadir:
-            dset_type = "synthetic"
-        elif "brics" in datadir:
-            dset_type = "brics"
-        else:
-            dset_type = "llff"
+        # BRICS/DiVa360 support only
+        dset_type = 'brics'
         if dset_type == "brics":
             if split == "render":
                 #assert ndc, "Unable to generate render poses without ndc: don't know near-far."
@@ -79,12 +75,6 @@ class Video360Dataset(BaseDataset):
                 print("Num poses: ", len(self.poses))
                 self.per_cam_near_fars = torch.tensor([[0.1, 15.0]])
                 timestamps = torch.arange(0, num_t)
-                # render_poses = generate_spiral_path(
-                #     per_cam_poses.numpy(), per_cam_near_fars.numpy(), n_frames=300,
-                #     n_rots=2, zrate=0.5, dt=self.near_scaling, percentile=60)
-                # self.poses = torch.from_numpy(render_poses).float()
-                # self.per_cam_near_fars = torch.tensor([[0.4, self.ndc_far]])
-                # timestamps = torch.linspace(0, 299, len(self.poses))
                 imgs = None
             else:
                 per_cam_poses, per_cam_near_fars, intrinsics, cam_ids = load_bricsvideo_poses(

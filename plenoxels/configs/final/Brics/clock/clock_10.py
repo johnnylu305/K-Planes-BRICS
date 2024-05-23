@@ -1,11 +1,11 @@
 config = {
 'expname' : 'clock_10',
-'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/clock/dynamic_data/kplanes',
+'logdir' : 'assets/objects/clock/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 1500,
 'num_t' : 150,
 'data_downsample' : 1,
-'data_dirs' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/clock/dynamic_data'],
+'data_dirs' : ['assets/objects/clock/dynamic_data'],
 'contract' : True,
 'ndc' : False,
 'ndc_far' : 2.6,

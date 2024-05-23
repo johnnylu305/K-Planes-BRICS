@@ -220,6 +220,7 @@ def init_tr_data(data_downsample, data_dir, **kwargs):
     keyframes = kwargs.get('keyframes', False)
     batch_size = kwargs['batch_size']
     log.info(f"Loading Video360Dataset with downsample={data_downsample}")
+    print(data_dir)
     tr_dset = Video360Dataset(
         data_dir, split='train', downsample=data_downsample,
         batch_size=batch_size,

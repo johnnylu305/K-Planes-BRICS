@@ -31,3 +31,7 @@ autodidact/
 assets/
 
 tmp
+
+make_config.py
+make_scripts.py
+make_traj_scripts.py

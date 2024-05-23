@@ -1,11 +1,11 @@
 config = {
 'expname' : 'wolf_06_IST',
-'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/wolf/dynamic_data/kplanes',
+'logdir' : 'assets/objects/wolf/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 900,
 'num_t' : 150,
 'data_downsample' : 2,
-'data_dirs' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/wolf/dynamic_data'],
+'data_dirs' : ['assets/objects/wolf/dynamic_data'],
 'contract' : True,
 'ndc' : False,
 'ndc_far' : 2.6,

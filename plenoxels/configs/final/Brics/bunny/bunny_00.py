@@ -1,11 +1,11 @@
 config = {
 'expname' : 'bunny_00',
-'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/bunny/dynamic_data/kplanes',
+'logdir' : 'assets/objects/bunny/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 0,
 'num_t' : 150,
 'data_downsample' : 1,
-'data_dirs' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/bunny/dynamic_data'],
+'data_dirs' : ['assets/objects/bunny/dynamic_data'],
 'contract' : True,
 'ndc' : False,
 'ndc_far' : 2.6,

@@ -1,11 +1,11 @@
 config = {
 'expname' : 'tea_02',
-'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/tea/dynamic_data/kplanes',
+'logdir' : 'assets/objects/tea/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 300,
 'num_t' : 30,
 'data_downsample' : 1,
-'data_dirs' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/tea/dynamic_data'],
+'data_dirs' : ['assets/objects/tea/dynamic_data'],
 'contract' : True,
 'ndc' : False,
 'ndc_far' : 2.6,

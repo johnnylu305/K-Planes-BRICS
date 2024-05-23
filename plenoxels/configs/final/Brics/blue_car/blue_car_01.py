@@ -1,11 +1,11 @@
 config = {
 'expname' : 'blue_car_01',
-'logdir' : '/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/blue_car/dynamic_data/kplanes',
+'logdir' : 'assets/objects/blue_car/dynamic_data/kplanes',
 'device' : 'cuda:0',
 'start_t' : 150,
 'num_t' : 101,
 'data_downsample' : 1,
-'data_dirs' : ['/oscar/data/ssrinath/projects/brics_dyscene/dynamic_1/brics-tools/assets/objects/blue_car/dynamic_data'],
+'data_dirs' : ['assets/objects/blue_car/dynamic_data'],
 'contract' : True,
 'ndc' : False,
 'ndc_far' : 2.6,
